@@ -5,6 +5,8 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <string.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 int id_scan(int sock_desc);
 
