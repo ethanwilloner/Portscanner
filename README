@@ -1,0 +1,6 @@
+This is a basic port scanner I have written. It is not very functional
+yet, nor do I think it will ever be awash in functionality. It is being
+written so as to help me teach myself the usages of sockets and network
+connectivity. I am also going to try to learn how to do this with
+threading at some point, as that is also an important topic to teach
+myself.
