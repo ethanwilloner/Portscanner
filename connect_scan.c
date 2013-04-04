@@ -7,12 +7,13 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-
+#include <stdbool.h>
+#include "scanner.h"
 
 /* Function prototypes */
 int id_scan(int sock_desc);
 
-int connect_scan(char *target, int port, int ID_FLAG) {
+int connect_scan(char *target, int port, bool ID_FLAG) {
 
     // Create socket descriptor
     int sock_desc;
@@ -44,8 +45,10 @@ int connect_scan(char *target, int port, int ID_FLAG) {
     printf("%d\t", port);
 
     // Handls the ID_FLAG
-    if(ID_FLAG == 1)
-        id_scan(sock_desc);    
+    if(ID_FLAG == true)
+        id_scan(sock_desc);
+    else
+        printf("\n");    
     close(sock_desc);
     return 1;
 }
@@ -64,13 +67,13 @@ int id_scan(int sock_desc) {
 
     // Error handling for the send() function
     if(send(sock_desc, message, strlen(message),0) == -1) {
-        printf("ID failed.");
+        printf("ID failed.\n");
         return 0;
     }
 
     // Error handling for the recv() function
     if(recv(sock_desc, received, 32, 0) == -1) {
-        printf("ID failed.");
+        printf("ID failed.\n");
         return 0;
     }
     printf("%s\n",received);

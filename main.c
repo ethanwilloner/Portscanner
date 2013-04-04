@@ -1,52 +1,51 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/socket.h>
 #include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/time.h>
-#include <string.h>
-
+#include <stdbool.h>
+#include <pthread.h>
+#include "scanner.h"
 
 /* This will matter once I have proper argument parsing */
 #define THREADS_DEFAULT 20
 #define PORTS_DEFAULT 10000
 
-
 /* Function prototypes. */
-void usage();
+void usage(char *name);
 void error(char *msg);
-int connect_scan(char *target, int port, int i);
+int connect_scan(char *target, int port, bool ID);
+void argparse(struct host *h);
+
 
 int main(int argc, char **argv) {
-    if(argc < 3) usage();
+    if(argc == 1) usage(argv[0]);
+    
+    struct host target;
+    argparse(&target);
 
-    /*
-       Sets up the port range and the target to pass to the
-       scan functions. Will be replaced at some point by
-       proper argument parsing
-   */
-    char *target = argv[1];
-    int port_start = atoi(argv[2]);
-    int port_end = atoi(argv[3]);
+    int port = 22;
+    connect_scan(target.host, port, target.ID);
+    
 
-    //Prints column labels
+    printf("%s\n",target.host); 
     printf("PORT\tSERVICE\n");
 
-    // for loop for running on the port range. Once again, will eventually
-    // be replaced in some capacity by a proper argument parser
-    for(int port = port_start; port <= port_end; port++)
-        // passes ID scan flag of one automatically, eventually will be parsed
-	connect_scan(target, port, 1);
     return 1;
 }
 
-void usage(){
-    printf("Usage: ./portscan ip initial_port final_port\n");
+void argparse(struct host *h) {
+   h->host = "Testing structs"; 
+}
+
+void usage(char *name){
+    printf ("Basic TCP Port Scanner with Threading\n");
+    printf ("Usage: %s [options] target [-p portstart-portend]\n", name);
+    printf("Options:\n");
+    printf("  -t <threads to use> (defaults to 20)\n");
+    printf("  -s scan using ports in /etc/services\n");\
+    printf("If no port range is set, will default to 1-10000\n"); 
     exit(0);
 }
 
