@@ -17,14 +17,13 @@ int connect_scan(char *target, int port, bool ID_FLAG) {
 
     // Create socket descriptor
     int sock_desc;
-
     // Set up socket and handle creation error
     if((sock_desc = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         {
             printf("Could not create socket.\n");
             exit(-1);
         }
-
+    
     // Create socket address struct
     struct sockaddr_in server;
 
@@ -38,17 +37,18 @@ int connect_scan(char *target, int port, bool ID_FLAG) {
 
     // Error handling for the connect() operation
     if(connect(sock_desc, (struct sockaddr *)&server, sizeof(server)) == -1) {
+        //printf("Could not connect to host.\n");
         close(sock_desc);
         return 0;
     }
-
+    
     printf("%d\t", port);
 
-    // Handls the ID_FLAG
+    // Handles the ID_FLAG
     if(ID_FLAG == true)
         id_scan(sock_desc);
     else
-        printf("\n");    
+        printf("OPEN\n");    
     close(sock_desc);
     return 1;
 }
@@ -72,7 +72,7 @@ int id_scan(int sock_desc) {
     }
 
     // Error handling for the recv() function
-    if(recv(sock_desc, received, 32, 0) == -1) {
+    if(recv(sock_desc, received, 20, 0) == -1) {
         printf("ID failed.\n");
         return 0;
     }
