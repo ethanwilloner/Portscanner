@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
@@ -37,11 +39,20 @@ int main(int argc, char *argv[]) {
 
 /* Argument parsing */
 void argparse(struct host *target, int argc, char *argv[]) {
-   target->host = argv[1];
-
+   //target->host = argv[1];
+    struct hostent *hostname = gethostbyname(argv[1]);
+    if(hostname == NULL)
+        error("Could not resolve domain name\n");
+   unsigned int i = 0;
+   char *host;
+   while(hostname->h_addr_list[i]!=NULL) {
+          host = inet_ntoa(*( struct in_addr*)(hostname->h_addr_list[i]));
+          i++;
+       }
+   target->host = host;
    /* Set defaults for struct */
    target->portstart = 0;
-   target->portstart = PORTS_DEFAULT;
+   target->portend = PORTS_DEFAULT;
    target->ID = false;
    for(int i = 0;i<argc;i++) {
        if(strcmp(argv[i],"-p")==0) {
