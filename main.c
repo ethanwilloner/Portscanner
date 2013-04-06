@@ -18,22 +18,36 @@
 /* Function prototypes. */
 void usage(char *name);
 void error(char *msg);
-int connect_scan(char *target, int port, bool ID);
+void connect_scan(struct host *target);
 void argparse(struct host *h, int argc, char *args[]);
 int getopt(int argc, char * const argv[], const char *optstring);
 extern char *optarg;
 extern int optind, opterr, optopt;
 
+void *ThreadedScan(void *pointer) {
+    connect_scan(pointer);
+    pthread_exit(NULL);
+}
 
 int main(int argc, char *argv[]) {
     if(argc == 1) usage(argv[0]);
 
-    struct host target;
-    argparse(&target, argc, argv);
+    struct host *target = malloc(sizeof(struct host));
+    argparse(target, argc, argv);
 
     printf("PORT\tSERVICE\n");
-    for(int port = target.portstart; port <= target.portend; port++)
-        connect_scan(target.host, port, target.ID);
+    
+
+    for(target->curr_port = target->portstart; target->curr_port <= target->portend; target->curr_port++) {
+        //pthread_t thread;
+        //pthread_create(&thread, NULL, ThreadedScan,(void*)target);
+       
+        /* Well, I tried to get threading working to no avail. Oh well,
+           the scanner works well enough that I can feel like it is
+           finished. */
+        
+        connect_scan(target);
+    }
     return 1;
 }
 
@@ -46,18 +60,21 @@ void argparse(struct host *target, int argc, char *argv[]) {
    unsigned int i = 0;
    char *host;
    while(hostname->h_addr_list[i]!=NULL) {
-          host = inet_ntoa(*( struct in_addr*)(hostname->h_addr_list[i]));
+          host = inet_ntoa(*(struct in_addr*)(hostname->h_addr_list[i]));
           i++;
        }
    target->host = host;
+
    /* Set defaults for struct */
    target->portstart = 0;
    target->portend = PORTS_DEFAULT;
+   target->curr_port = 0;
    target->ID = false;
    for(int i = 0;i<argc;i++) {
        if(strcmp(argv[i],"-p")==0) {
            target->portstart = atoi(argv[i+1]);
            target->portend = atoi(argv[i+2]);
+           target->curr_port = target->portstart;
           }
        if(strcmp(argv[i],"-t")==0) {
            if(atoi(argv[i+1])>THREADS_MAX) {
@@ -68,8 +85,6 @@ void argparse(struct host *target, int argc, char *argv[]) {
         }
         if(strcmp(argv[i],"-id")==0)
             target->ID = true;
-        else
-            target->ID = false;
    }
 }
 

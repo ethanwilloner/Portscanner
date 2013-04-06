@@ -12,45 +12,43 @@
 
 /* Function prototypes */
 int id_scan(int sock_desc);
-
-int connect_scan(char *target, int port, bool ID_FLAG) {
-
+//int connect_scan(char *target, int port, bool ID_FLAG) {
+void connect_scan(struct host *target) {
     // Create socket descriptor
     int sock_desc;
     // Set up socket and handle creation error
     if((sock_desc = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         {
-            printf("Could not create socket.\n");
-            exit(-1);
+            //printf("Could not create socket.\n");
+            //target->active_threads--;
+            return;
         }
     
     // Create socket address struct
     struct sockaddr_in server;
 
-    // TODO: A handler for inputing both domain names and ip addresses
-    // TODO: Handler for resolving to IPv6.
-
     // Sets up the values inside the newly created socket address struct
-    server.sin_addr.s_addr = inet_addr(target);
+    server.sin_addr.s_addr = inet_addr(target->host);
     server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-
+    server.sin_port = htons(target->curr_port);
     // Error handling for the connect() operation
     if(connect(sock_desc, (struct sockaddr *)&server, sizeof(server)) == -1) {
         //printf("Could not connect to host.\n");
         close(sock_desc);
-        return 0;
+        //target->active_threads--;
+        return;
     }
     
-    printf("%d\t", port);
+    printf("%d\t", target->curr_port);
 
     // Handles the ID_FLAG
-    if(ID_FLAG == true)
+    if(target->ID == true)
         id_scan(sock_desc);
     else
         printf("OPEN\n");    
     close(sock_desc);
-    return 1;
+    //target->active_threads--;
+    return;
 }
 
 
