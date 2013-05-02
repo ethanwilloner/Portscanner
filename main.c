@@ -20,9 +20,6 @@ void usage(char *name);
 void error(char *msg);
 void connect_scan(struct host *target);
 void argparse(struct host *h, int argc, char *args[]);
-int getopt(int argc, char * const argv[], const char *optstring);
-extern char *optarg;
-extern int optind, opterr, optopt;
 
 void *ThreadedScan(void *pointer) {
     connect_scan(pointer);
